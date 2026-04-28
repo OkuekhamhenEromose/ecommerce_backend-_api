@@ -1,43 +1,45 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, RefreshTokenDto, LogoutDto } from './dto/auth.dto';
-import { Public } from '../../common/decorators/public.decorator';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Public()
   @Post('register')
+  @Public()
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiResponse({ status: 201, description: 'User successfully registered' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
-  @Public()
   @Post('login')
+  @Public()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
-  @ApiResponse({ status: 200, description: 'Login successful' })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
-  @Public()
   @Post('refresh')
+  @Public()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
-  async refresh(@Body() dto: RefreshTokenDto) {
-    return this.authService.refreshTokens(dto.refreshToken);
+  async refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout user' })
   async logout(@Request() req) {
-    return this.authService.logout(req.user.id);
+    return { message: 'Logout successful' };
   }
 }

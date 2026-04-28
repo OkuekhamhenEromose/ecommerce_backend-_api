@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsBoolean } from 'class-validator';
 
 export class UpdateProfileDto {
@@ -108,19 +108,5 @@ export class CreateAddressDto {
   isDefault?: boolean;
 }
 
-export class UpdateAddressDto extends CreateAddressDto {
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  fullName?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  country?: string;
-
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  streetAddress?: string;
-}
+// Use PartialType to make all fields optional for updates
+export class UpdateAddressDto extends PartialType(CreateAddressDto) {}

@@ -10,10 +10,11 @@ import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CartModule } from './modules/cart/cart.module';
 import { OrdersModule } from './modules/orders/orders.module';
-import { CheckoutModule } from './modules/checkout/checkout.module';
-import { WishlistModule } from './modules/wishlist/wishlist.module';
-import { ReviewsModule } from './modules/reviews/reviews.module';
-import { ShopsModule } from './modules/shops/shops.module';
+// Temporarily comment out complex modules
+// import { CheckoutModule } from './modules/checkout/checkout.module';
+// import { WishlistModule } from './modules/wishlist/wishlist.module';
+// import { ReviewsModule } from './modules/reviews/reviews.module';
+// import { ShopsModule } from './modules/shops/shops.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
@@ -46,10 +47,10 @@ import configuration from './config/configuration';
     CategoriesModule,
     CartModule,
     OrdersModule,
-    CheckoutModule,
-    WishlistModule,
-    ReviewsModule,
-    ShopsModule,
+    // CheckoutModule,
+    // WishlistModule,
+    // ReviewsModule,
+    // ShopsModule,
   ],
   providers: [
     {

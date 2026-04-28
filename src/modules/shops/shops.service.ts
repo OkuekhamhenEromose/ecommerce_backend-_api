@@ -6,7 +6,6 @@ export class ShopsService {
   constructor(private prisma: PrismaService) {}
 
   async createShop(userId: string, createShopDto: any) {
-    // Get user profile
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -15,7 +14,6 @@ export class ShopsService {
       throw new NotFoundException('User not found');
     }
 
-    // Check if user already has a shop
     const existingShop = await this.prisma.shop.findFirst({
       where: { sellerId: userId },
     });
@@ -32,8 +30,6 @@ export class ShopsService {
         shopSlug: shopSlug,
         description: createShopDto.description || '',
         country: createShopDto.country || 'United States',
-        currency: createShopDto.currency || 'USD',
-        language: createShopDto.language || 'en',
         sellerId: userId,
         isOpen: true,
       },
@@ -56,7 +52,7 @@ export class ShopsService {
 
   async getShopBySlug(slug: string) {
     const shop = await this.prisma.shop.findUnique({
-      where: { shopSlug: slug, isActive: true },
+      where: { shopSlug: slug },
     });
 
     if (!shop) {
