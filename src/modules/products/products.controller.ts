@@ -33,8 +33,10 @@ export class ProductsController {
   @Get()
   @Public()
   @ApiOperation({ summary: 'Get all products' })
-  async findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
-    return this.productsService.findAll(page, limit || 20);
+  async findAll(@Query('page') page?: string, @Query('limit') limit?: string) {
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 20;
+    return this.productsService.findAll(pageNum, limitNum);
   }
 
   @Get(':slug')

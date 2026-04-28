@@ -29,12 +29,13 @@ export class ProductsService {
 
   async findAll(page: number = 1, limit: number = 20) {
     const skip = (page - 1) * limit;
+    const take = limit;
 
     const [products, total] = await Promise.all([
       this.prisma.product.findMany({
         where: { isAvailable: true },
-        skip,
-        take: limit,
+        skip: skip,
+        take: take,
         orderBy: { createdAt: 'desc' },
       }),
       this.prisma.product.count({ where: { isAvailable: true } }),

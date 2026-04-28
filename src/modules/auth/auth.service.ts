@@ -39,6 +39,7 @@ export class AuthService {
       },
     });
 
+    // Create profile
     await this.prisma.profile.create({
       data: {
         userId: user.id,
@@ -94,7 +95,7 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        secret: this.configService.get('jwt.secret'),
+        secret: this.configService.get<string>('JWT_SECRET'),
       });
 
       const user = await this.prisma.user.findUnique({
@@ -115,14 +116,11 @@ export class AuthService {
     const payload = { sub: userId, email, role };
 
     const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: this.configService.get('jwt.refreshExpiresIn') || '30d',
-    });
+    const refreshToken = this.jwtService.sign(payload);
 
     return {
       accessToken,
       refreshToken,
-      expiresIn: this.configService.get('jwt.expiresIn') || '7d',
     };
   }
 }

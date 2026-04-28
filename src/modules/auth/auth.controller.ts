@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -12,14 +12,14 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('register')
-  @Public()
+  @Public()  // Add this decorator
   @ApiOperation({ summary: 'Register a new user' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
   @Post('login')
-  @Public()
+  @Public()  // Add this decorator
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login user' })
   async login(@Body() dto: LoginDto) {
@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @Public()
+  @Public()  // Add this decorator
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh access token' })
   async refreshToken(@Body('refreshToken') refreshToken: string) {
@@ -36,8 +36,8 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout user' })
   async logout(@Request() req) {
     return { message: 'Logout successful' };
