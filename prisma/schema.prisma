@@ -7,13 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Replace enum with String for SQLite
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
   username  String   @unique
   password  String
-  role      String   @default("USER")  // Changed from enum to String
+  role      String   @default("USER")
   fullName  String?
   phone     String?
   createdAt DateTime @default(now())
@@ -60,14 +59,14 @@ model Category {
   description String?
   image       String?
   parentId    String?
-  parent      Category? @relation("CategoryToCategory", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryToCategory")
   isActive    Boolean  @default(true)
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  products    Product[]
+  parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryToCategory")
+  products Product[]
   
   @@index([slug])
   @@index([parentId])
@@ -101,9 +100,7 @@ model Product {
   image4          String?
   
   categoryId      String?
-  category        Category? @relation(fields: [categoryId], references: [id])
   sellerId        String?
-  seller          Profile?  @relation(fields: [sellerId], references: [id])
   
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -112,6 +109,9 @@ model Product {
   orderItems      OrderItem[]
   reviews         Review[]
   wishlistItems   WishlistItem[]
+  
+  category Category? @relation(fields: [categoryId], references: [id])
+  seller   Profile?  @relation(fields: [sellerId], references: [id])
   
   @@index([slug])
   @@index([categoryId])
@@ -123,10 +123,11 @@ model Cart {
   id        String    @id @default(cuid())
   total     Float     @default(0)
   profileId String?   @unique
-  profile   Profile?  @relation(fields: [profileId], references: [id])
-  items     CartItem[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  
+  profile Profile?  @relation(fields: [profileId], references: [id])
+  items   CartItem[]
   
   @@index([profileId])
 }
@@ -137,12 +138,13 @@ model CartItem {
   priceAtAdd    Float
   subtotal      Float
   cartId        String
-  cart          Cart      @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId     String
-  product       Product   @relation(fields: [productId], references: [id])
   selectedSize  String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
   
   @@unique([cartId, productId])
   @@index([cartId])
@@ -172,12 +174,13 @@ model Order {
   isGift          Boolean  @default(false)
   giftMessage     String?
   userId          String?
-  user            User?    @relation(fields: [userId], references: [id])
   profileId       String?
-  profile         Profile? @relation(fields: [profileId], references: [id])
-  items           OrderItem[]
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  
+  user    User?     @relation(fields: [userId], references: [id])
+  profile Profile?  @relation(fields: [profileId], references: [id])
+  items   OrderItem[]
   
   @@index([orderNumber])
   @@index([userId])
@@ -191,10 +194,11 @@ model OrderItem {
   selectedSize  String?
   subtotal      Float
   orderId       String
-  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productId     String?
-  product       Product?  @relation(fields: [productId], references: [id])
   createdAt     DateTime  @default(now())
+  
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id])
   
   @@index([orderId])
   @@index([productId])
@@ -207,13 +211,14 @@ model Review {
   comment       String
   helpfulCount  Int       @default(0)
   productId     String
-  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId        String
-  user          User      @relation(fields: [userId], references: [id])
   profileId     String
-  profile       Profile   @relation(fields: [profileId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
   
   @@unique([productId, userId])
   @@index([productId])
@@ -223,12 +228,13 @@ model Review {
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   profileId String   @unique
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  items     WishlistItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  items   WishlistItem[]
   
   @@index([userId])
 }
@@ -236,10 +242,11 @@ model Wishlist {
 model WishlistItem {
   id         String   @id @default(cuid())
   wishlistId String
-  wishlist   Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   productId  String
-  product    Product  @relation(fields: [productId], references: [id])
   createdAt  DateTime @default(now())
+  
+  wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
   
   @@unique([wishlistId, productId])
   @@index([wishlistId])
@@ -264,10 +271,11 @@ model Shop {
   rating      Float    @default(0)
   reviewCount Int      @default(0)
   sellerId    String   @unique
-  seller      Profile  @relation(fields: [sellerId], references: [id])
-  socialLinks String?   // Changed from Json to String (store as JSON string)
+  socialLinks String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  seller Profile @relation(fields: [sellerId], references: [id])
   
   @@index([shopSlug])
   @@index([sellerId])
