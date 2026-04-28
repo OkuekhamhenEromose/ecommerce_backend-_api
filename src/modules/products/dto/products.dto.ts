@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsString,
   IsNumber,
@@ -9,7 +9,16 @@ import {
   Min,
   MaxLength,
 } from 'class-validator';
-import { ProductCondition } from '@prisma/client';
+
+// Define local enum instead of importing from Prisma
+export enum ProductCondition {
+  NEW = 'new',
+  LIKE_NEW = 'like_new',
+  GOOD = 'good',
+  FAIR = 'fair',
+  VINTAGE = 'vintage',
+  HANDMADE = 'handmade',
+}
 
 export class CreateProductDto {
   @ApiProperty()
@@ -37,19 +46,21 @@ export class CreateProductDto {
   @Min(0)
   discountPrice?: number;
 
-  @ApiProperty()
+  @ApiProperty({ required: false, default: 0 })
+  @IsOptional()
   @IsNumber()
   @Min(0)
-  inStock: number;
+  inStock?: number;
 
   @ApiProperty({ enum: ProductCondition, default: ProductCondition.NEW })
   @IsOptional()
   @IsEnum(ProductCondition)
   condition?: ProductCondition;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  mainImage: string;
+  mainImage?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -96,9 +107,10 @@ export class CreateProductDto {
   @IsBoolean()
   isDeal?: boolean;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsOptional()
   @IsString()
-  categoryId: string;
+  categoryId?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
@@ -203,5 +215,3 @@ export class CreateVariantDto {
   @IsNumber()
   displayOrder?: number;
 }
-
-import { PartialType } from '@nestjs/swagger';

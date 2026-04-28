@@ -1,30 +1,24 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CacheService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
   async get<T>(key: string): Promise<T | null> {
-    const value = await this.cacheManager.get<T>(key);
-    return value !== undefined ? value : null;
+    return null;
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
-    await this.cacheManager.set(key, value, ttl);
+    // Mock implementation - does nothing
   }
 
   async del(key: string): Promise<void> {
-    await this.cacheManager.del(key);
+    // Mock implementation - does nothing
   }
 
   async delPattern(pattern: string): Promise<void> {
-    // Simple implementation - just log that this is a stub
-    console.log(`delPattern for ${pattern} - implement with Redis client if needed`);
+    // Mock implementation - does nothing
   }
 
   async reset(): Promise<void> {
-    console.log('reset cache - implement with Redis client if needed');
+    // Mock implementation - does nothing
   }
 }

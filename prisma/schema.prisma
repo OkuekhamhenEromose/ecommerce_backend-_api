@@ -18,13 +18,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile   Profile?
-  products  Product[]
-  orders    Order[]
-  reviews   Review[]
-  cart      Cart?
-  wishlist  Wishlist?
-  
+  profile  Profile?
+  products Product[]
+  orders   Order[]
+  reviews  Review[]
+  cart     Cart?
+  wishlist Wishlist?
+  shop     Shop?
+
   @@index([email])
   @@index([username])
 }
@@ -42,13 +43,6 @@ model Profile {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  products  Product[]
-  reviews   Review[]
-  orders    Order[]
-  cart      Cart?
-  wishlist  Wishlist?
-  shop      Shop?
-  
   @@index([userId])
 }
 
@@ -67,52 +61,52 @@ model Category {
   parent   Category?  @relation("CategoryToCategory", fields: [parentId], references: [id])
   children Category[] @relation("CategoryToCategory")
   products Product[]
-  
+
   @@index([slug])
   @@index([parentId])
 }
 
 model Product {
-  id              String    @id @default(cuid())
-  title           String
-  slug            String    @unique
-  description     String
+  id               String  @id @default(cuid())
+  title            String
+  slug             String  @unique
+  description      String
   shortDescription String?
-  price           Float
-  discountPrice   Float?
-  finalPrice      Float?
-  sku             String?   @unique
-  condition       String    @default("new")
-  inStock         Int       @default(0)
-  isAvailable     Boolean   @default(true)
-  isFeatured      Boolean   @default(false)
-  isDeal          Boolean   @default(false)
-  isNewArrival    Boolean   @default(false)
-  rating          Float     @default(0)
-  reviewCount     Int       @default(0)
-  color           String?
-  material        String?
-  
-  mainImage       String?
-  image1          String?
-  image2          String?
-  image3          String?
-  image4          String?
-  
-  categoryId      String?
-  sellerId        String?
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  cartItems       CartItem[]
-  orderItems      OrderItem[]
-  reviews         Review[]
-  wishlistItems   WishlistItem[]
-  
+  price            Float
+  discountPrice    Float?
+  finalPrice       Float?
+  sku              String? @unique
+  condition        String  @default("new")
+  inStock          Int     @default(0)
+  isAvailable      Boolean @default(true)
+  isFeatured       Boolean @default(false)
+  isDeal           Boolean @default(false)
+  isNewArrival     Boolean @default(false)
+  rating           Float   @default(0)
+  reviewCount      Int     @default(0)
+  color            String?
+  material         String?
+
+  mainImage String?
+  image1    String?
+  image2    String?
+  image3    String?
+  image4    String?
+
+  categoryId String?
+  sellerId   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cartItems     CartItem[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+  wishlistItems WishlistItem[]
+
   category Category? @relation(fields: [categoryId], references: [id])
-  seller   Profile?  @relation(fields: [sellerId], references: [id])
-  
+  seller   User?     @relation(fields: [sellerId], references: [id])
+
   @@index([slug])
   @@index([categoryId])
   @@index([sellerId])
@@ -120,106 +114,102 @@ model Product {
 }
 
 model Cart {
-  id        String    @id @default(cuid())
-  total     Float     @default(0)
-  profileId String?   @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  profile Profile?  @relation(fields: [profileId], references: [id])
-  items   CartItem[]
-  
-  @@index([profileId])
+  id        String   @id @default(cuid())
+  total     Float    @default(0)
+  userId    String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User?      @relation(fields: [userId], references: [id])
+  items CartItem[]
+
+  @@index([userId])
 }
 
 model CartItem {
-  id            String    @id @default(cuid())
-  quantity      Int       @default(1)
-  priceAtAdd    Float
-  subtotal      Float
-  cartId        String
-  productId     String
-  selectedSize  String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id           String   @id @default(cuid())
+  quantity     Int      @default(1)
+  priceAtAdd   Float
+  subtotal     Float
+  cartId       String
+  productId    String
+  selectedSize String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
-  
+
   @@unique([cartId, productId])
   @@index([cartId])
   @@index([productId])
 }
 
 model Order {
-  id              String   @id @default(cuid())
-  orderNumber     String   @unique
-  amount          Float
-  subtotal        Float
-  shippingCost    Float    @default(0)
-  tax             Float    @default(0)
-  discountAmount  Float    @default(0)
-  fullName        String
-  email           String
-  phone           String
-  address         String
-  city            String
-  state           String?
-  postalCode      String?
-  country         String
-  status          String   @default("PENDING")
-  paymentMethod   String   @default("PAYSTACK")
-  paymentStatus   String   @default("PENDING")
+  id               String   @id @default(cuid())
+  orderNumber      String   @unique
+  amount           Float
+  subtotal         Float
+  shippingCost     Float    @default(0)
+  tax              Float    @default(0)
+  discountAmount   Float    @default(0)
+  fullName         String
+  email            String
+  phone            String
+  address          String
+  city             String
+  state            String?
+  postalCode       String?
+  country          String
+  status           String   @default("PENDING")
+  paymentMethod    String   @default("PAYSTACK")
+  paymentStatus    String   @default("PENDING")
   paymentReference String?  @unique
-  isGift          Boolean  @default(false)
-  giftMessage     String?
-  userId          String?
-  profileId       String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  user    User?     @relation(fields: [userId], references: [id])
-  profile Profile?  @relation(fields: [profileId], references: [id])
-  items   OrderItem[]
-  
+  isGift           Boolean  @default(false)
+  giftMessage      String?
+  userId           String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  user  User?       @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
   @@index([orderNumber])
   @@index([userId])
 }
 
 model OrderItem {
-  id            String    @id @default(cuid())
-  productName   String
-  productPrice  Float
-  quantity      Int
-  selectedSize  String?
-  subtotal      Float
-  orderId       String
-  productId     String?
-  createdAt     DateTime  @default(now())
-  
+  id           String   @id @default(cuid())
+  productName  String
+  productPrice Float
+  quantity     Int
+  selectedSize String?
+  subtotal     Float
+  orderId      String
+  productId    String?
+  createdAt    DateTime @default(now())
+
   order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id])
-  
+
   @@index([orderId])
   @@index([productId])
 }
 
 model Review {
-  id            String    @id @default(cuid())
-  rating        Int
-  title         String?
-  comment       String
-  helpfulCount  Int       @default(0)
-  productId     String
-  userId        String
-  profileId     String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  
+  id           String   @id @default(cuid())
+  rating       Int
+  title        String?
+  comment      String
+  helpfulCount Int      @default(0)
+  productId    String
+  userId       String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id])
-  profile Profile @relation(fields: [profileId], references: [id])
-  
+
   @@unique([productId, userId])
   @@index([productId])
   @@index([userId])
@@ -228,14 +218,12 @@ model Review {
 model Wishlist {
   id        String   @id @default(cuid())
   userId    String   @unique
-  profileId String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  items   WishlistItem[]
-  
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WishlistItem[]
+
   @@index([userId])
 }
 
@@ -244,10 +232,10 @@ model WishlistItem {
   wishlistId String
   productId  String
   createdAt  DateTime @default(now())
-  
+
   wishlist Wishlist @relation(fields: [wishlistId], references: [id], onDelete: Cascade)
   product  Product  @relation(fields: [productId], references: [id])
-  
+
   @@unique([wishlistId, productId])
   @@index([wishlistId])
   @@index([productId])
@@ -257,27 +245,15 @@ model Shop {
   id          String   @id @default(cuid())
   shopName    String   @unique
   shopSlug    String   @unique
-  shopLogo    String?
-  shopBanner  String?
   description String?
-  announcement String?
   country     String   @default("United States")
-  currency    String   @default("USD")
-  language    String   @default("en")
   isOpen      Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  totalSales  Int      @default(0)
-  totalProducts Int    @default(0)
-  rating      Float    @default(0)
-  reviewCount Int      @default(0)
   sellerId    String   @unique
-  socialLinks String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  seller Profile @relation(fields: [sellerId], references: [id])
-  
+
+  seller User @relation(fields: [sellerId], references: [id])
+
   @@index([shopSlug])
   @@index([sellerId])
-  @@index([isOpen])
 }

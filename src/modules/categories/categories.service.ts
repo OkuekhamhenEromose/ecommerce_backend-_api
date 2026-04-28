@@ -2,14 +2,10 @@ import { Injectable, NotFoundException, ConflictException } from '@nestjs/common
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CacheService } from '../../common/services/cache.service';
 
 @Injectable()
 export class CategoriesService {
-  constructor(
-    private prisma: PrismaService,
-    private cacheService: CacheService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createCategoryDto: CreateCategoryDto) {
     const slug = this.generateSlug(createCategoryDto.name);
@@ -33,18 +29,10 @@ export class CategoriesService {
       },
     });
 
-    await this.cacheService.delPattern('categories:*');
     return category;
   }
 
   async findAll(parentId?: string) {
-    const cacheKey = `categories:all:${parentId || 'root'}`;
-    const cached = await this.cacheService.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-
     const where: any = { isActive: true };
     if (parentId) {
       where.parentId = parentId;
@@ -55,62 +43,21 @@ export class CategoriesService {
     const categories = await this.prisma.category.findMany({
       where,
       orderBy: { order: 'asc' },
-      include: {
-        children: {
-          where: { isActive: true },
-          orderBy: { order: 'asc' },
-        },
-      },
     });
 
-    // Get product counts separately
-    const categoriesWithCounts = await Promise.all(
-      categories.map(async (category) => {
-        const productCount = await this.prisma.product.count({
-          where: { categoryId: category.id, isAvailable: true },
-        });
-        return { ...category, productCount };
-      })
-    );
-
-    await this.cacheService.set(cacheKey, categoriesWithCounts, 3600);
-    return categoriesWithCounts;
+    return categories;
   }
 
   async findOne(slug: string) {
-    const cacheKey = `category:${slug}`;
-    const cached = await this.cacheService.get(cacheKey);
-    
-    if (cached) {
-      return cached;
-    }
-
     const category = await this.prisma.category.findUnique({
       where: { slug, isActive: true },
-      include: {
-        parent: true,
-        children: {
-          where: { isActive: true },
-          orderBy: { order: 'asc' },
-        },
-      },
     });
 
     if (!category) {
       throw new NotFoundException('Category not found');
     }
 
-    // Get products for this category
-    const products = await this.prisma.product.findMany({
-      where: { categoryId: category.id, isAvailable: true },
-      take: 20,
-      orderBy: { rating: 'desc' },
-    });
-
-    const result = { ...category, products };
-
-    await this.cacheService.set(cacheKey, result, 3600);
-    return result;
+    return category;
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
@@ -124,9 +71,6 @@ export class CategoriesService {
       where: { id },
       data: updateCategoryDto,
     });
-
-    await this.cacheService.del(`category:${category.slug}`);
-    await this.cacheService.delPattern('categories:*');
     
     return updated;
   }
@@ -142,9 +86,6 @@ export class CategoriesService {
       where: { id },
       data: { isActive: false },
     });
-
-    await this.cacheService.del(`category:${category.slug}`);
-    await this.cacheService.delPattern('categories:*');
     
     return { message: 'Category deleted successfully' };
   }
