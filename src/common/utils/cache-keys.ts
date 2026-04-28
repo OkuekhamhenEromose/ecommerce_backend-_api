@@ -1,6 +1,6 @@
 export class CacheKeys {
   private static readonly PREFIX = 'ecommerce:';
-  
+
   // Category cache keys
   static readonly CATEGORY_LIST = `${this.PREFIX}categories:list`;
   static readonly PARENT_CATEGORIES = `${this.PREFIX}categories:parent`;
@@ -10,7 +10,7 @@ export class CacheKeys {
   static categoryProducts(slug: string, page: number = 1, limit: number = 20): string {
     return `${this.PREFIX}category:${slug}:products:${page}:${limit}`;
   }
-  
+
   // Product cache keys
   static product(slug: string): string {
     return `${this.PREFIX}product:${slug}`;
@@ -27,13 +27,13 @@ export class CacheKeys {
   static similarProducts(productId: string): string {
     return `${this.PREFIX}product:${productId}:similar`;
   }
-  
+
   // Homepage cache keys
   static readonly HOMEPAGE = `${this.PREFIX}homepage:data`;
   static readonly DEALS = `${this.PREFIX}deals:list`;
   static readonly NEW_ARRIVALS = `${this.PREFIX}products:new-arrivals`;
   static readonly FEATURED = `${this.PREFIX}products:featured`;
-  
+
   // Cart cache keys
   static cart(userId: string): string {
     return `${this.PREFIX}cart:${userId}`;
@@ -41,7 +41,7 @@ export class CacheKeys {
   static cartSession(sessionId: string): string {
     return `${this.PREFIX}cart:session:${sessionId}`;
   }
-  
+
   // User cache keys
   static user(id: string): string {
     return `${this.PREFIX}user:${id}`;
@@ -52,7 +52,7 @@ export class CacheKeys {
   static userWishlist(userId: string): string {
     return `${this.PREFIX}user:${userId}:wishlist`;
   }
-  
+
   // Shop cache keys
   static shop(slug: string): string {
     return `${this.PREFIX}shop:${slug}`;
@@ -60,7 +60,7 @@ export class CacheKeys {
   static shopProducts(shopSlug: string, page: number = 1): string {
     return `${this.PREFIX}shop:${shopSlug}:products:${page}`;
   }
-  
+
   // Clear patterns
   static clearProduct(productId: string, productSlug: string): void {
     // Implementation in service

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -17,6 +18,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ShopsModule } from './modules/shops/shops.module';
 import { PrismaModule } from './modules/prisma/prisma.module';
 
+import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import configuration from './config/configuration';
 
 @Module({
@@ -27,6 +29,7 @@ import configuration from './config/configuration';
       envFilePath: ['.env', '.env.local'],
     }),
     ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         throttlers: [
           {
@@ -45,7 +48,7 @@ import configuration from './config/configuration';
             host: configService.get<string>('REDIS_HOST', 'localhost'),
             port: configService.get<number>('REDIS_PORT', 6379),
           },
-          ttl: 300, // 5 minutes default
+          ttl: 300,
         });
         return { store };
       },
@@ -63,6 +66,12 @@ import configuration from './config/configuration';
     WishlistModule,
     ReviewsModule,
     ShopsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}

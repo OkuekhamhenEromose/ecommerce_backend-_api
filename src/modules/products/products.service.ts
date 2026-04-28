@@ -97,7 +97,19 @@ export class ProductsService {
   }
 
   async findAll(query: ProductQueryDto) {
-    const { page = 1, limit = 20, search, categoryId, minPrice, maxPrice, sort, isFeatured, isDeal, isNewArrival, inStock } = query;
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      categoryId,
+      minPrice,
+      maxPrice,
+      sort,
+      isFeatured,
+      isDeal,
+      isNewArrival,
+      inStock,
+    } = query;
     const skip = (page - 1) * limit;
 
     // Build filter

@@ -7,7 +7,8 @@ export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async get<T>(key: string): Promise<T | null> {
-    return this.cacheManager.get<T>(key);
+    const value = await this.cacheManager.get<T>(key);
+    return value !== undefined ? value : null;
   }
 
   async set(key: string, value: any, ttl?: number): Promise<void> {
@@ -18,18 +19,12 @@ export class CacheService {
     await this.cacheManager.del(key);
   }
 
-  async reset(): Promise<void> {
-    await this.cacheManager.reset();
+  async delPattern(pattern: string): Promise<void> {
+    // Simple implementation - just log that this is a stub
+    console.log(`delPattern for ${pattern} - implement with Redis client if needed`);
   }
 
-  async getOrSet<T>(key: string, factory: () => Promise<T>, ttl?: number): Promise<T> {
-    const cached = await this.get<T>(key);
-    if (cached) {
-      return cached;
-    }
-
-    const value = await factory();
-    await this.set(key, value, ttl);
-    return value;
+  async reset(): Promise<void> {
+    console.log('reset cache - implement with Redis client if needed');
   }
 }

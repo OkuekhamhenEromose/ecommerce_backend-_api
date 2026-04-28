@@ -46,7 +46,11 @@ export class ProductsController {
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @ApiQuery({ name: 'minPrice', required: false, type: Number })
   @ApiQuery({ name: 'maxPrice', required: false, type: Number })
-  @ApiQuery({ name: 'sort', required: false, enum: ['price_asc', 'price_desc', 'rating_desc', 'newest'] })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    enum: ['price_asc', 'price_desc', 'rating_desc', 'newest'],
+  })
   @ApiQuery({ name: 'isFeatured', required: false, type: Boolean })
   @ApiQuery({ name: 'isDeal', required: false, type: Boolean })
   @ApiQuery({ name: 'isNewArrival', required: false, type: Boolean })

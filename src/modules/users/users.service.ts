@@ -15,7 +15,7 @@ export class UsersService {
   async getProfile(userId: string) {
     const cacheKey = CacheKeys.userProfile(userId);
     const cached = await this.cacheService.get(cacheKey);
-    
+
     if (cached) {
       return cached;
     }

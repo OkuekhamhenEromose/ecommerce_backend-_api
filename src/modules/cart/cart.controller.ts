@@ -33,7 +33,11 @@ export class CartController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Add item to cart' })
-  async addToCart(@Request() req, @Body() dto: AddToCartDto, @Query('sessionId') sessionId?: string) {
+  async addToCart(
+    @Request() req,
+    @Body() dto: AddToCartDto,
+    @Query('sessionId') sessionId?: string,
+  ) {
     return this.cartService.addToCart(req.user.id, dto, sessionId);
   }
 
@@ -54,7 +58,11 @@ export class CartController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove item from cart' })
-  async removeCartItem(@Request() req, @Param('itemId') itemId: string, @Query('sessionId') sessionId?: string) {
+  async removeCartItem(
+    @Request() req,
+    @Param('itemId') itemId: string,
+    @Query('sessionId') sessionId?: string,
+  ) {
     return this.cartService.removeCartItem(req.user.id, itemId, sessionId);
   }
 

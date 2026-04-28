@@ -36,14 +36,8 @@ export class CartService {
     });
 
     // Calculate totals
-    const subtotal = cartWithItems.items.reduce(
-      (sum, item) => sum + Number(item.subtotal),
-      0,
-    );
-    const totalItems = cartWithItems.items.reduce(
-      (sum, item) => sum + item.quantity,
-      0,
-    );
+    const subtotal = cartWithItems.items.reduce((sum, item) => sum + Number(item.subtotal), 0);
+    const totalItems = cartWithItems.items.reduce((sum, item) => sum + item.quantity, 0);
 
     return {
       ...cartWithItems,
@@ -85,7 +79,8 @@ export class CartService {
         throw new BadRequestException(`Only ${variant.inStock} items available for this variant`);
       }
 
-      pricePerUnit = Number(product.discountPrice || product.price) + Number(variant.priceAdjustment);
+      pricePerUnit =
+        Number(product.discountPrice || product.price) + Number(variant.priceAdjustment);
     }
 
     // Get or create cart
@@ -177,9 +172,7 @@ export class CartService {
     }
 
     // Check stock
-    const maxStock = cartItem.variant
-      ? cartItem.variant.inStock
-      : cartItem.product.inStock;
+    const maxStock = cartItem.variant ? cartItem.variant.inStock : cartItem.product.inStock;
 
     if (quantity > maxStock) {
       throw new BadRequestException(`Only ${maxStock} items available`);

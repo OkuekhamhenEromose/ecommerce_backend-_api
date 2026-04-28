@@ -27,7 +27,7 @@ export class CheckoutService {
           },
         },
       });
-      
+
       if (cart) {
         items = cart.items;
       }
@@ -44,10 +44,12 @@ export class CheckoutService {
 
     // Validate stock
     for (const item of items) {
-      const product = item.product || await this.prisma.product.findUnique({
-        where: { id: item.productId },
-      });
-      
+      const product =
+        item.product ||
+        (await this.prisma.product.findUnique({
+          where: { id: item.productId },
+        }));
+
       if (!product) {
         throw new BadRequestException(`Product not found: ${item.productId}`);
       }
@@ -61,7 +63,7 @@ export class CheckoutService {
     // Calculate totals
     let subtotal = 0;
     for (const item of items) {
-      const price = item.pricePerUnit || (item.product?.discountPrice || item.product?.price);
+      const price = item.pricePerUnit || item.product?.discountPrice || item.product?.price;
       subtotal += Number(price) * item.quantity;
     }
 
@@ -82,7 +84,7 @@ export class CheckoutService {
 
       if (discount && (!discount.usageLimit || discount.usedCount < discount.usageLimit)) {
         if (discount.discountType === 'PERCENTAGE') {
-          discountAmount = subtotal * Number(discount.discountValue) / 100;
+          discountAmount = (subtotal * Number(discount.discountValue)) / 100;
           if (discount.maxDiscount) {
             discountAmount = Math.min(discountAmount, Number(discount.maxDiscount));
           }
@@ -129,10 +131,12 @@ export class CheckoutService {
 
     // Create order items
     for (const item of items) {
-      const product = item.product || await this.prisma.product.findUnique({
-        where: { id: item.productId },
-        include: { seller: true },
-      });
+      const product =
+        item.product ||
+        (await this.prisma.product.findUnique({
+          where: { id: item.productId },
+          include: { seller: true },
+        }));
 
       const pricePerUnit = item.pricePerUnit || Number(product.discountPrice || product.price);
       const subtotalItem = pricePerUnit * item.quantity;
@@ -256,7 +260,8 @@ export class CheckoutService {
       const sellerEarnings: Record<string, number> = {};
       for (const item of orderItems) {
         if (item.product?.sellerId) {
-          sellerEarnings[item.product.sellerId] = (sellerEarnings[item.product.sellerId] || 0) + Number(item.sellerEarnings);
+          sellerEarnings[item.product.sellerId] =
+            (sellerEarnings[item.product.sellerId] || 0) + Number(item.sellerEarnings);
         }
       }
 

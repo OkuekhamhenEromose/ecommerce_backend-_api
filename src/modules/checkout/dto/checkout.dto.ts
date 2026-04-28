@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsString,
-  IsEmail,
-  IsOptional,
-  IsBoolean,
-  IsArray,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsEmail, IsOptional, IsBoolean, IsArray, IsNumber } from 'class-validator';
 
 export class CheckoutAddressDto {
   @ApiProperty()
