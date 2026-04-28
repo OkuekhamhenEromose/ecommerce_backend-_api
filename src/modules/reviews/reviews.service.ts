@@ -1,16 +1,11 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateReviewDto } from './dto/create-review.dto';
 
 @Injectable()
 export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
-  async createReview(userId: string, productId: string, createReviewDto: CreateReviewDto) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
-
+  async createReview(userId: string, productId: string, createReviewDto: any) {
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
@@ -19,7 +14,6 @@ export class ReviewsService {
       throw new NotFoundException('Product not found');
     }
 
-    // Check if user already reviewed this product
     const existingReview = await this.prisma.review.findFirst({
       where: {
         productId,
@@ -38,7 +32,6 @@ export class ReviewsService {
         comment: createReviewDto.comment,
         productId,
         userId,
-        profileId: profile!.id,
       },
     });
 
@@ -59,7 +52,6 @@ export class ReviewsService {
             fullName: true,
           },
         },
-        profile: true,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -77,7 +69,7 @@ export class ReviewsService {
     };
   }
 
-  async updateReview(userId: string, reviewId: string, updateReviewDto: Partial<CreateReviewDto>) {
+  async updateReview(userId: string, reviewId: string, updateReviewDto: any) {
     const review = await this.prisma.review.findUnique({
       where: { id: reviewId },
     });

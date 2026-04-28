@@ -6,20 +6,12 @@ export class WishlistService {
   constructor(private prisma: PrismaService) {}
 
   async getWishlist(userId: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
-
     let wishlist = await this.prisma.wishlist.findUnique({
-      where: { profileId: profile?.id },
+      where: { userId },
       include: {
         items: {
           include: {
-            product: {
-              include: {
-                category: true,
-              },
-            },
+            product: true,
           },
         },
       },
@@ -27,10 +19,7 @@ export class WishlistService {
 
     if (!wishlist) {
       wishlist = await this.prisma.wishlist.create({
-        data: {
-          userId,
-          profileId: profile!.id,
-        },
+        data: { userId },
         include: {
           items: {
             include: {
@@ -45,10 +34,6 @@ export class WishlistService {
   }
 
   async addToWishlist(userId: string, productId: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
-
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
     });
@@ -58,15 +43,12 @@ export class WishlistService {
     }
 
     let wishlist = await this.prisma.wishlist.findUnique({
-      where: { profileId: profile?.id },
+      where: { userId },
     });
 
     if (!wishlist) {
       wishlist = await this.prisma.wishlist.create({
-        data: {
-          userId,
-          profileId: profile!.id,
-        },
+        data: { userId },
       });
     }
 
@@ -88,12 +70,8 @@ export class WishlistService {
   }
 
   async removeFromWishlist(userId: string, productId: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { userId },
-    });
-
     const wishlist = await this.prisma.wishlist.findUnique({
-      where: { profileId: profile?.id },
+      where: { userId },
     });
 
     if (wishlist) {

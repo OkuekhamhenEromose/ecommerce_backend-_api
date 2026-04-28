@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
-import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -14,7 +13,7 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create product review' })
-  async createReview(@Request() req, @Param('productId') productId: string, @Body() createReviewDto: CreateReviewDto) {
+  async createReview(@Request() req, @Param('productId') productId: string, @Body() createReviewDto: any) {
     return this.reviewsService.createReview(req.user.id, productId, createReviewDto);
   }
 
@@ -29,7 +28,7 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update review' })
-  async updateReview(@Request() req, @Param('id') id: string, @Body() updateReviewDto: Partial<CreateReviewDto>) {
+  async updateReview(@Request() req, @Param('id') id: string, @Body() updateReviewDto: any) {
     return this.reviewsService.updateReview(req.user.id, id, updateReviewDto);
   }
 

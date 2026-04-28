@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Put, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ShopsService } from './shops.service';
-import { CreateShopDto } from './dto/create-shop.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Public } from '../../common/decorators/public.decorator';
 
@@ -14,7 +13,7 @@ export class ShopsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a shop' })
-  async createShop(@Request() req, @Body() createShopDto: CreateShopDto) {
+  async createShop(@Request() req, @Body() createShopDto: any) {
     return this.shopsService.createShop(req.user.id, createShopDto);
   }
 
@@ -30,7 +29,7 @@ export class ShopsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update shop' })
-  async updateShop(@Request() req, @Body() updateShopDto: Partial<CreateShopDto>) {
+  async updateShop(@Request() req, @Body() updateShopDto: any) {
     return this.shopsService.updateShop(req.user.id, updateShopDto);
   }
 
